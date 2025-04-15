@@ -1,0 +1,19 @@
+name: 'Manually Approve Workflow'
+on:
+  workflow_call:
+
+
+jobs:
+  hold:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: trstringer/manual-approval@v1
+        id: approval
+        with:
+          secret: ${{ github.token }}
+          approvers: ${{ vars.APPROVERS }}
+          timeout-minutes: 30
+          issue-title: 'Production Deployment Approval'
+          issue-body: 'Please approve the deployment to production.'

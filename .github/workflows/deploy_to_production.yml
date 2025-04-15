@@ -1,0 +1,27 @@
+name: 'Reusuable Deploy to Production Workflow'
+
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+      node_version:
+        required: true
+        type: string
+
+jobs:
+  deploy_to_production:
+    runs-on: ubuntu-latest
+    steps:
+      - id: restore_caches
+        uses: Acrisure-Cyber-Services-dba-Otto-bot/otto-github-actions-workflows/.github/actions/restore_caches_action.yml
+        with:
+          project_name: ${{ inputs.project_name }}
+          node_version: ${{ inputs.node_version }}
+      
+      - name: Build TypeScript files
+        run: npm run build:prod
+      
+      - name: Swap Azure App Service staging and production slots
+        run: node scripts/slot-swap

@@ -1,0 +1,30 @@
+name: 'Restore Repository and dependencies Cache'
+description: 'Restores the repository and npm dependencies cache for a given project and commit SHA.'
+inputs:
+  project_name:
+    required: true
+    type: string
+  node_version:
+    required: true
+    type: string
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Restore repository cache
+      uses: actions/cache@v4
+      with:
+        path: .
+        key: ${{ inputs.project_name }}-repo-${{ github.sha }}
+        
+    - name: Restore npm cache
+      uses: actions/cache@v4
+      with:
+        path: ./node_modules
+        key: ${{ inputs.project_name }}-npm-dependencies-${{ github.ref_name }}-${{ hashFiles('package.json') }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+        cache: 'npm'

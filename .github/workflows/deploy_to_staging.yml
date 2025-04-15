@@ -1,0 +1,59 @@
+name: 'Reusable Deploy to Staging Workflow'
+
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+      node_version:
+        required: true
+        type: string
+
+jobs:
+  deploy_to_staging:
+    runs-on: ubuntu-latest
+    steps:
+      - id: restore_caches
+        uses: Acrisure-Cyber-Services-dba-Otto-bot/otto-github-actions-workflows/.github/actions/restore_caches_action.yml
+        with:
+          project_name: ${{ inputs.project_name }}
+          node_version: ${{ inputs.node_version }}
+
+      - name: Build TypeScript files
+        run: npm run build:prod
+
+      - name: Remove dev dependencies
+        run: npm prune --production
+
+      - name: Remove unused files
+        run: |
+          rm -rf \
+            .git/ \
+            .gitignore \
+            .gitattributes \
+            .editorconfig \
+            package-lock.json
+
+      - name: Build Deployment Archive
+        run: |
+          zip -rq bundle.zip .
+          echo "Bundle complete."
+          ls -l -h bundle.zip
+
+
+      - name: Azure CLI Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure App Service (Staging)
+        id: deploy-staging
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ inputs.project_name }}
+          slot-name: staging
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          package: bundle.zip

@@ -1,0 +1,24 @@
+name: Reusuable Lint Workflow with Caching
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+      node_version:
+        required: true
+        type: string
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - id: restore_caches
+        uses: Acrisure-Cyber-Services-dba-Otto-bot/otto-github-actions-workflows/.github/actions/restore_caches_action.yml
+        with:
+          project_name: ${{ inputs.project_name }}
+          node_version: ${{ inputs.node_version }}
+      
+      - name: Run lint
+        run: npm run lint

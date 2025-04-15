@@ -1,0 +1,21 @@
+name: Reusuable Checkout Workflow with Caching
+
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+
+jobs:
+  checkout_code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache repository
+        uses: actions/cache@v4
+        with:
+          path: .
+          key: ${{ inputs.project_name }}-repo-${{ github.sha }}
