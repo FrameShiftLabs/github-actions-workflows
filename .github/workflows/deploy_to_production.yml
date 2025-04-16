@@ -9,6 +9,9 @@ on:
       node_version:
         required: true
         type: string
+      resource_group:
+        required: true
+        type: string
 
 jobs:
   deploy_to_production:
@@ -23,5 +26,20 @@ jobs:
       - name: Build TypeScript files
         run: npm run build:prod
       
+      - name: Azure CLI Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Swap Azure App Service staging and production slots
-        run: node scripts/slot-swap
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az webapp deployment slot swap \
+              --name ${{ inputs.project_name }} \
+              --resource-group ${{ vars.RESOURCE_GROUP }} \
+              --slot staging \
+              --target-slot production
