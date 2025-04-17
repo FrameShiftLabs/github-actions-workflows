@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: restore_caches
-        uses: ./.github/actions/restore_caches_action.yml
+        uses: Acrisure-Cyber-Services-dba-Otto-bot/otto-github-actions-workflows/.github/actions/restore_caches_action.yml@main
         with:
           project_name: ${{ inputs.project_name }}
           node_version: ${{ inputs.node_version }}
