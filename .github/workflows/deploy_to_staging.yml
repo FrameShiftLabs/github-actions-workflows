@@ -54,11 +54,10 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Azure App Service (Staging)
+      - name: Deploy to Azure App Service / Function App (Staging)
         id: deploy-staging
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ inputs.project_name }}
           slot-name: staging
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: bundle.zip
