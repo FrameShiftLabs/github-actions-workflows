@@ -17,6 +17,7 @@ permissions:
 jobs:
   deploy_to_production:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Restore Caches
         uses: Acrisure-Cyber-Services-dba-Otto-bot/otto-github-actions-workflows/.github/actions/restore-caches@main

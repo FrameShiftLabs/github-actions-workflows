@@ -17,6 +17,7 @@ permissions:
 jobs:
   deploy_to_staging:
     runs-on: ubuntu-latest
+    environment: staging
     steps:
       - name: Restore Caches
         uses: Acrisure-Cyber-Services-dba-Otto-bot/otto-github-actions-workflows/.github/actions/restore-caches@main
