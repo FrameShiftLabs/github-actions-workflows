@@ -2,12 +2,12 @@ name: 'Manually Approve Workflow'
 on:
   workflow_call:
 
+permissions:
+  issues: write
 
 jobs:
   hold:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
       - uses: trstringer/manual-approval@v1
         id: approval
