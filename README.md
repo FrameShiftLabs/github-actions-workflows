@@ -1,4 +1,4 @@
-## Otto.bot Reusuable Workflows
+## Reusuable Workflows
 
 This repository contains Github Actions workflows that can be reused across repositories.
 
@@ -9,7 +9,7 @@ This repository contains Github Actions workflows that can be reused across repo
 Example:
 ```
 env:
-  PROJECT_NAME: itsupportbot-utility-functions
+  PROJECT_NAME: app-utility-functions
   NODE_VERSION: 20.11.0
 
 ```
