@@ -9,6 +9,10 @@ on:
       node_version:
         required: true
         type: string
+      angular_caches:
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
@@ -24,9 +28,10 @@ jobs:
         with:
           project_name: ${{ inputs.project_name }}
           node_version: ${{ inputs.node_version }}
+          angular_caches: ${{ inputs.angular_caches }}
 
       - name: Build TypeScript files
-        run: npm run build:prod
+        run: npm run build
 
       - name: Remove dev dependencies
         run: npm prune --production

@@ -1,0 +1,33 @@
+name: Reusuable Angular Tests Workflow with Caching
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+      node_version:
+        required: true
+        type: string
+
+
+jobs:
+  angular_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore Caches
+        uses: harshithkashyap/github-actions-workflows/.github/actions/restore-caches@main
+        with:
+          project_name: ${{ inputs.project_name }}
+          node_version: ${{ inputs.node_version }}
+          angular_caches: true
+
+      - name: Build TypeScript files
+        run: npm run build:server
+
+      - name: Angular Unit Tests
+        run: |
+          if [[ -d ./dist ]]; then
+            echo "No tests were run as there were no changes to the src/angular files."
+          else
+            npm run ng -- test --code-coverage --configuration=test --watch=false --progress=false --browsers=ChromeHeadless
+          fi

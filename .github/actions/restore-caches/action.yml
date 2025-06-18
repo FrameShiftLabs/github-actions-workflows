@@ -7,6 +7,10 @@ inputs:
   node_version:
     required: true
     type: string
+  angular_caches:
+    required: false
+    type: boolean
+    default: false
 
 runs:
   using: 'composite'
@@ -28,3 +32,10 @@ runs:
       with:
         node-version: ${{ inputs.node_version }}
         cache: 'npm'
+
+    - name: Restore Angular Build and Cache Files
+      if: ${{ inputs.angular_caches }}
+      uses: actions/cache@v4
+      with:
+        path: ./dist
+        key: ${{ inputs.project_name }}-angular-build-${{ hashFiles('src/**/*') }}
