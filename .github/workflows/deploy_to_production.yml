@@ -1,4 +1,4 @@
-name: 'Reusuable Deploy to Production Workflow'
+name: 'Reusable Deploy to Production Workflow'
 
 on:
   workflow_call:
@@ -10,6 +10,10 @@ on:
         required: true
         type: string
       angular_caches:
+        required: false
+        type: boolean
+        default: false
+      turborepo_caches:
         required: false
         type: boolean
         default: false
@@ -29,9 +33,7 @@ jobs:
           project_name: ${{ inputs.project_name }}
           node_version: ${{ inputs.node_version }}
           angular_caches: ${{ inputs.angular_caches }}
-      
-      - name: Build TypeScript files
-        run: npm run build
+          turborepo_caches: ${{ inputs.turborepo_caches }}
       
       - name: Azure CLI Login
         uses: azure/login@v2

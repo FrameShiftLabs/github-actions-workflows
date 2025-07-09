@@ -1,0 +1,43 @@
+name: 'Reusable Database Migrations Workflow'
+
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+        description: 'Project name for cache keys and identification'
+      node_version:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+        description: 'Environment to run migrations against (staging or production)'
+      turborepo_caches:
+        required: false
+        type: boolean
+        default: false
+        description: 'Whether to use Turborepo caches'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  run_database_migrations:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Restore Caches
+        uses: harshithkashyap/github-actions-workflows/.github/actions/restore-caches@main
+        with:
+          project_name: ${{ inputs.project_name }}
+          node_version: ${{ inputs.node_version }}
+          turborepo_caches: ${{ inputs.turborepo_caches }}
+      
+      - name: Run Database Migrations
+        run: |
+          pnpm --filter=@repo/db run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

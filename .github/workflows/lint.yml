@@ -1,4 +1,5 @@
-name: Reusuable Lint Workflow with Caching
+name: 'Reusable Lint Workflow'
+
 on:
   workflow_call:
     inputs:
@@ -8,7 +9,15 @@ on:
       node_version:
         required: true
         type: string
-
+      is_turborepo:
+        required: false
+        type: boolean
+        default: false
+        description: 'Whether this is a turborepo project (enables turborepo caches and type checking)'
+      angular_caches:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   lint:
@@ -19,6 +28,12 @@ jobs:
         with:
           project_name: ${{ inputs.project_name }}
           node_version: ${{ inputs.node_version }}
+          angular_caches: ${{ inputs.angular_caches }}
+          turborepo_caches: ${{ inputs.is_turborepo }}
       
       - name: Run lint
-        run: npm run lint
+        run: pnpm run lint
+
+      - name: Run type checking
+        if: ${{ inputs.is_turborepo }}
+        run: pnpm run check-types

@@ -22,12 +22,12 @@ jobs:
           angular_caches: true
 
       - name: Build TypeScript files
-        run: npm run build:server
+        run: pnpm run build:server
 
       - name: Angular Unit Tests
         run: |
           if [[ -d ./dist ]]; then
             echo "No tests were run as there were no changes to the src/angular files."
           else
-            npm run ng -- test --code-coverage --configuration=test --watch=false --progress=false --browsers=ChromeHeadless
+            pnpm run ng -- test --code-coverage --configuration=test --watch=false --progress=false --browsers=ChromeHeadless
           fi

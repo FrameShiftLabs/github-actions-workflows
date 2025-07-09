@@ -1,0 +1,47 @@
+name: 'Reusable Turborepo Build Workflow'
+
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+      node_version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore Caches
+        uses: harshithkashyap/github-actions-workflows/.github/actions/restore-caches@main
+        with:
+          project_name: ${{ inputs.project_name }}
+          node_version: ${{ inputs.node_version }}
+          turborepo_caches: true
+
+      - name: Build all packages and apps
+        run: pnpm run build
+
+      - name: Save Turborepo Build Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .turbo
+            apps/*/.next
+            apps/*/.turbo
+            apps/*/dist
+            apps/*/build
+            packages/*/.turbo
+            packages/*/dist
+            packages/*/build
+            packages/*/src/**/*.js
+            packages/*/src/**/*.js.map
+            packages/*/src/**/*.d.ts
+            packages/*/src/**/*.d.ts.map
+            node_modules/.cache
+          key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/package.json', 'turbo.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-
+            ${{ inputs.project_name }}-turborepo-build-

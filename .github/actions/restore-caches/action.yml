@@ -1,16 +1,20 @@
 name: 'Restore Repository and dependencies Cache'
-description: 'Restores the repository and npm dependencies cache for a given project and commit SHA.'
+description: 'Restores the repository and pnpm dependencies cache for a given project and commit SHA.'
 inputs:
   project_name:
+    description: 'The name of the project'
     required: true
-    type: string
   node_version:
+    description: 'The Node.js version to use'
     required: true
-    type: string
   angular_caches:
+    description: 'Whether to restore Angular build caches'
     required: false
-    type: boolean
-    default: false
+    default: 'false'
+  turborepo_caches:
+    description: 'Whether to restore turborepo build caches'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -20,22 +24,54 @@ runs:
       with:
         path: .
         key: ${{ inputs.project_name }}-repo-${{ github.sha }}
-        
-    - name: Restore npm cache
+      
+    - name: Restore pnpm cache
       uses: actions/cache@v4
       with:
-        path: ./node_modules
-        key: ${{ inputs.project_name }}-npm-dependencies-${{ github.ref_name }}-${{ hashFiles('package.json') }}
+        path: |
+          ~/.pnpm-store
+          node_modules
+          apps/*/node_modules
+          packages/*/node_modules
+        key: ${{ inputs.project_name }}-pnpm-dependencies-${{ github.ref_name }}-${{ hashFiles('pnpm-lock.yaml') }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
-        cache: 'npm'
+        cache: 'pnpm'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Restore Angular Build and Cache Files
-      if: ${{ inputs.angular_caches }}
+      if: ${{ inputs.angular_caches == 'true' }}
       uses: actions/cache@v4
       with:
         path: ./dist
         key: ${{ inputs.project_name }}-angular-build-${{ hashFiles('src/**/*') }}
+
+    - name: Restore Turborepo Build Cache
+      if: ${{ inputs.turborepo_caches == 'true' }}
+      uses: actions/cache@v4
+      with:
+        path: |
+          .turbo
+          apps/*/.next
+          apps/*/.turbo
+          apps/*/dist
+          apps/*/build
+          packages/*/.turbo
+          packages/*/dist
+          packages/*/build
+          packages/*/src/**/*.js
+          packages/*/src/**/*.js.map
+          packages/*/src/**/*.d.ts
+          packages/*/src/**/*.d.ts.map
+          node_modules/.cache
+        key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/package.json', 'turbo.json', 'pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-
+          ${{ inputs.project_name }}-turborepo-build-

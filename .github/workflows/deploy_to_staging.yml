@@ -9,7 +9,15 @@ on:
       node_version:
         required: true
         type: string
+      package_filter:
+        required: false
+        type: string
+        description: 'pnpm filter for workspace projects (e.g., "frontend" or "@repo/api-server")'
       angular_caches:
+        required: false
+        type: boolean
+        default: false
+      turborepo_caches:
         required: false
         type: boolean
         default: false
@@ -29,28 +37,35 @@ jobs:
           project_name: ${{ inputs.project_name }}
           node_version: ${{ inputs.node_version }}
           angular_caches: ${{ inputs.angular_caches }}
+          turborepo_caches: ${{ inputs.turborepo_caches }}
 
-      - name: Build TypeScript files
-        run: npm run build
-
-      - name: Remove dev dependencies
-        run: npm prune --production
-
-      - name: Remove unused files
+      - name: Build and prepare deployment
         run: |
-          rm -rf \
-            .git/ \
-            .gitignore \
-            .gitattributes \
-            .editorconfig \
-            package-lock.json
-
-      - name: Build Deployment Archive
-        run: |
+          # Build all dependencies
+          pnpm run build
+          
+          if [ -n "${{ inputs.package_filter }}" ]; then
+            # Workspace project: Create deployment directory with all dependencies resolved
+            pnpm --filter=${{ inputs.package_filter }} deploy --prod deploy/
+            cd deploy/
+          else
+            # Single repo project: Remove dev dependencies and unused files
+            pnpm prune --prod
+            
+            # Remove unused files
+            rm -rf \
+              .git/ \
+              .gitignore \
+              .gitattributes \
+              .editorconfig \
+              package-lock.json \
+              pnpm-lock.yaml
+          fi
+          
+          # Create deployment archive
           zip -rq bundle.zip .
           echo "Bundle complete."
           ls -l -h bundle.zip
-
 
       - name: Azure CLI Login
         uses: azure/login@v2
@@ -65,4 +80,4 @@ jobs:
         with:
           app-name: ${{ inputs.project_name }}
           slot-name: staging
-          package: bundle.zip
+          package: ${{ inputs.package_filter != '' && 'deploy/bundle.zip' || 'bundle.zip' }}
