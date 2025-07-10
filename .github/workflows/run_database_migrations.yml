@@ -35,7 +35,7 @@ jobs:
           project_name: ${{ inputs.project_name }}
           node_version: ${{ inputs.node_version }}
           turborepo_caches: ${{ inputs.turborepo_caches }}
-      
+
       - name: Run Database Migrations
         run: |
           pnpm --filter=@repo/db run db:migrate
