@@ -45,9 +45,6 @@ jobs:
 
       - name: Build and prepare deployment
         run: |
-          # Build all dependencies
-          pnpm run build
-          
           if [ -n "${{ inputs.package_filter }}" ]; then
             # Workspace project: Create deployment directory with all dependencies resolved
             pnpm --filter=${{ inputs.package_filter }} deploy --prod deploy/
