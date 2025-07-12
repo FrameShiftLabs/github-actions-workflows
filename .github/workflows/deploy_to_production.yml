@@ -17,6 +17,10 @@ on:
         required: false
         type: boolean
         default: false
+      azure_app_name:
+        required: false
+        type: string
+        description: 'Azure App Service or Function App name (if different from project_name)'
 
 permissions:
   id-token: write
@@ -48,7 +52,7 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az webapp deployment slot swap \
-              --name ${{ inputs.project_name }} \
+              --name ${{ inputs.azure_app_name || inputs.project_name }} \
               --resource-group ${{ vars.RESOURCE_GROUP }} \
               --slot staging \
               --target-slot production

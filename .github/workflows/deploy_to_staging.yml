@@ -21,6 +21,10 @@ on:
         required: false
         type: boolean
         default: false
+      azure_app_name:
+        required: false
+        type: string
+        description: 'Azure App Service or Function App name (if different from project_name)'
 
 permissions:
   id-token: write
@@ -78,6 +82,6 @@ jobs:
         id: deploy-staging
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ inputs.project_name }}
+          app-name: ${{ inputs.azure_app_name || inputs.project_name }}
           slot-name: staging
           package: ${{ inputs.package_filter != '' && 'deploy/bundle.zip' || 'bundle.zip' }}
