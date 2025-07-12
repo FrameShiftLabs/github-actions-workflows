@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Restore Caches
-        uses: harshithkashyap/github-actions-workflows/.github/actions/restore-caches@main
+        uses: FrameShiftLabs/github-actions-workflows/.github/actions/restore-caches@main
         with:
           project_name: ${{ inputs.project_name }}
           node_version: ${{ inputs.node_version }}

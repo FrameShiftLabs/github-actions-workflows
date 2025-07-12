@@ -30,7 +30,7 @@ Modern, pnpm-first CI/CD workflows for JavaScript/TypeScript projects.
 ```yaml
 jobs:
   build:
-    uses: harshithkashyap/github-actions-workflows/.github/workflows/turborepo_build.yml@main
+    uses: FrameShiftLabs/github-actions-workflows/.github/workflows/turborepo_build.yml@main
     with:
       project_name: ${{ github.event.repository.name }}
       node_version: ${{ vars.NODE_VERSION }}
