@@ -25,16 +25,6 @@ runs:
         path: .
         key: ${{ inputs.project_name }}-repo-${{ github.sha }}
       
-    - name: Restore pnpm cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.pnpm-store
-          node_modules
-          apps/*/node_modules
-          packages/*/node_modules
-        key: ${{ inputs.project_name }}-pnpm-dependencies-${{ github.ref_name }}-${{ hashFiles('pnpm-lock.yaml') }}
-
     - name: Install pnpm
       uses: pnpm/action-setup@v4
 
@@ -59,15 +49,7 @@ runs:
           .turbo
           apps/*/.next
           apps/*/.turbo
-          apps/*/dist
-          apps/*/build
           packages/*/.turbo
-          packages/*/dist
-          packages/*/build
-          packages/*/src/**/*.js
-          packages/*/src/**/*.js.map
-          packages/*/src/**/*.d.ts
-          packages/*/src/**/*.d.ts.map
           node_modules/.cache
         key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/package.json', 'turbo.json', 'pnpm-lock.yaml') }}
         restore-keys: |
