@@ -14,19 +14,11 @@ jobs:
   bundle_dependencies:
     runs-on: ubuntu-latest
     steps:
-      - name: Restore repository cache
-        uses: actions/cache@v4
+      - name: Restore Caches
+        uses: harshithkashyap/github-actions-workflows/.github/actions/restore-caches@main
         with:
-          path: .
-          key: ${{ inputs.project_name }}-repo-${{ github.sha }}
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node_version }}
+          project_name: ${{ inputs.project_name }}
+          node_version: ${{ inputs.node_version }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
