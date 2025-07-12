@@ -22,6 +22,12 @@ on:
         type: boolean
         default: false
 
+      pnpm_package_json_file:
+        required: true
+        type: string
+        default: 'package.json'
+        description: 'The path to the package.json file for pnpm setup (usually root package.json)'
+
 permissions:
   id-token: write
   contents: read
@@ -38,6 +44,7 @@ jobs:
           node_version: ${{ inputs.node_version }}
           angular_caches: ${{ inputs.angular_caches }}
           turborepo_caches: ${{ inputs.turborepo_caches }}
+          pnpm_package_json_file: ${{ inputs.pnpm_package_json_file }}
 
       - name: Build and prepare deployment
         run: |

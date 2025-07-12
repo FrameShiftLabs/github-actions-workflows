@@ -15,6 +15,10 @@ inputs:
     description: 'Whether to restore turborepo build caches'
     required: false
     default: 'false'
+  pnpm_package_json_file:
+    description: 'The path to the package.json file for pnpm setup (usually root package.json)'
+    required: true
+    default: 'package.json'
 
 runs:
   using: 'composite'
@@ -37,6 +41,8 @@ runs:
 
     - name: Install pnpm
       uses: pnpm/action-setup@v4
+      with:
+        package_json_file: ${{ inputs.pnpm_package_json_file }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
