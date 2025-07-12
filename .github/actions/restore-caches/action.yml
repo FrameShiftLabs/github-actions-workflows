@@ -58,8 +58,13 @@ runs:
           apps/*/.next
           apps/*/.turbo
           packages/*/.turbo
-          node_modules/.cache
-        key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/package.json', 'turbo.json', 'pnpm-lock.yaml') }}
+          apps/*/dist
+          packages/*/dist
+          apps/*/build
+          packages/*/build
+          apps/*/lib
+          packages/*/lib
+        key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('turbo.json', 'pnpm-lock.yaml', '**/tsconfig.json', 'apps/**/src/**', 'packages/**/src/**', '!**/node_modules/**') }}
         restore-keys: |
           ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-
           ${{ inputs.project_name }}-turborepo-build-
