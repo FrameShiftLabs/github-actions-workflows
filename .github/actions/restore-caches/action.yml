@@ -25,6 +25,15 @@ runs:
         path: .
         key: ${{ inputs.project_name }}-repo-${{ github.sha }}
       
+    - name: Restore pnpm cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+          apps/*/node_modules
+          packages/*/node_modules
+        key: ${{ inputs.project_name }}-pnpm-dependencies-${{ github.ref_name }}-${{ hashFiles('pnpm-lock.yaml') }}
+    
     - name: Install pnpm
       uses: pnpm/action-setup@v4
 
@@ -32,7 +41,6 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
-        cache: 'pnpm'
 
     - name: Restore Angular Build and Cache Files
       if: ${{ inputs.angular_caches == 'true' }}
