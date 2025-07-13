@@ -42,4 +42,4 @@ jobs:
             packages/*/src/**/*.js.map
             packages/*/src/**/*.d.ts
             packages/*/src/**/*.d.ts.map
-          key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('turbo.json', 'pnpm-lock.yaml', '**/tsconfig.json', 'apps/**/src/**', 'packages/**/src/**', '!**/node_modules/**') }}
+          key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('turbo.json', 'pnpm-lock.yaml', '**/tsconfig.json', 'apps/**/src/**', 'packages/**/src/**', '!**/node_modules/**', '!**/*.js', '!**/*.js.map', '!**/*.d.ts', '!**/*.d.ts.map') }}
