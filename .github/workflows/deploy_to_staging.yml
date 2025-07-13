@@ -47,21 +47,17 @@ jobs:
           angular_caches: ${{ inputs.angular_caches }}
           turborepo_caches: ${{ inputs.turborepo_caches }}
 
-      - name: Build and prepare deployment
+      - name: Prepare deployment
         run: |
           if [ -n "${{ inputs.package_filter }}" ]; then
             # Check if this is an Azure Functions app (has host.json)
             if pnpm --filter=${{ inputs.package_filter }} exec test -f host.json; then
-              pnpm --filter=${{ inputs.package_filter }} run build
-              
               # Deploy Functions app with all dependencies resolved
               pnpm --filter=${{ inputs.package_filter }} deploy --prod deploy/
               
               (cd deploy/ && zip -rq ../bundle.zip .)
               
             else
-              pnpm --filter=${{ inputs.package_filter }} run build:standalone
-              
               STANDALONE_DIR="apps/${{ inputs.turborepo_app_name }}/.next/standalone"              
               (cd "$STANDALONE_DIR" && zip -rq ../../../bundle.zip .)
             fi
