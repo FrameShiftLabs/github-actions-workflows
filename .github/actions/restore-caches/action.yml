@@ -58,9 +58,9 @@ runs:
           apps/*/.next
           apps/*/.next/standalone
           apps/*/.turbo
-          packages/*/.turbo
           apps/*/src/**/*.js
           apps/*/src/**/*.js.map
+          packages/*/.turbo
           packages/*/src/**/*.js
           packages/*/src/**/*.js.map
           packages/*/src/**/*.d.ts
