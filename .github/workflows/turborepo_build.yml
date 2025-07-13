@@ -44,6 +44,3 @@ jobs:
             packages/*/src/**/*.d.ts.map
             node_modules/.cache
           key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/package.json', 'turbo.json', 'pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-
-            ${{ inputs.project_name }}-turborepo-build-
