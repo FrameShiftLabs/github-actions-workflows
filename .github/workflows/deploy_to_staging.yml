@@ -59,7 +59,7 @@ jobs:
               
             else
               STANDALONE_DIR="apps/${{ inputs.turborepo_app_name }}/.next/standalone"              
-              (cd "$STANDALONE_DIR" && zip -rq ../../../bundle.zip .)
+              (cd "$STANDALONE_DIR" && zip -rq ../../../../bundle.zip .)
             fi
             
           else
