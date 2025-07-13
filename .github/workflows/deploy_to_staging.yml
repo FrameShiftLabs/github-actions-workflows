@@ -57,13 +57,13 @@ jobs:
               # Deploy Functions app with all dependencies resolved
               pnpm --filter=${{ inputs.package_filter }} deploy --prod deploy/
               
-              zip -rq bundle.zip -C deploy/ .
+              (cd deploy/ && zip -rq ../bundle.zip .)
               
             else
               pnpm --filter=${{ inputs.package_filter }} run build:standalone
               
               STANDALONE_DIR="apps/${{ inputs.turborepo_app_name }}/.next/standalone"              
-              zip -rq bundle.zip -C "$STANDALONE_DIR" .
+              (cd "$STANDALONE_DIR" && zip -rq ../../../bundle.zip .)
             fi
             
           else
