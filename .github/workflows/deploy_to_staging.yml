@@ -21,6 +21,10 @@ on:
         required: false
         type: boolean
         default: false
+      turborepo_app_name:
+        required: false
+        type: string
+        description: 'Name of the Turborepo app'
       azure_app_name:
         required: false
         type: string
@@ -46,14 +50,28 @@ jobs:
       - name: Build and prepare deployment
         run: |
           if [ -n "${{ inputs.package_filter }}" ]; then
-            # Workspace project: Create deployment directory with all dependencies resolved
-            pnpm --filter=${{ inputs.package_filter }} deploy --prod deploy/
-            cd deploy/
-          else
-            # Single repo project: Remove dev dependencies and unused files
-            pnpm prune --prod
+            # Check if this is an Azure Functions app (has host.json)
+            if pnpm --filter=${{ inputs.package_filter }} exec test -f host.json; then
+              pnpm --filter=${{ inputs.package_filter }} run build
+              
+              # Deploy Functions app with all dependencies resolved
+              pnpm --filter=${{ inputs.package_filter }} deploy --prod deploy/
+              
+              zip -rq bundle.zip -C deploy/ .
+              
+            else
+              pnpm --filter=${{ inputs.package_filter }} run build:standalone
+              
+              STANDALONE_DIR="apps/${{ inputs.turborepo_app_name }}/.next/standalone"              
+              zip -rq bundle.zip -C "$STANDALONE_DIR" .
+            fi
             
-            # Remove unused files
+          else
+            # Single repo project: Build and package normally
+            pnpm run build
+            
+            # Remove dev dependencies and unused files
+            pnpm prune --prod
             rm -rf \
               .git/ \
               .gitignore \
@@ -61,10 +79,11 @@ jobs:
               .editorconfig \
               package-lock.json \
               pnpm-lock.yaml
+            
+            # Create deployment archive
+            zip -rq bundle.zip .
           fi
           
-          # Create deployment archive
-          zip -rq bundle.zip .
           echo "Bundle complete."
           ls -l -h bundle.zip
 
@@ -81,4 +100,4 @@ jobs:
         with:
           app-name: ${{ inputs.azure_app_name || inputs.project_name }}
           slot-name: staging
-          package: ${{ inputs.package_filter != '' && 'deploy/bundle.zip' || 'bundle.zip' }}
+          package: bundle.zip
