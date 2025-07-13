@@ -33,12 +33,11 @@ jobs:
           path: |
             .turbo
             apps/*/.next
+            apps/*/.next/standalone
             apps/*/.turbo
-            apps/*/dist
-            apps/*/build
+            apps/*/src/**/*.js
+            apps/*/src/**/*.js.map
             packages/*/.turbo
-            packages/*/dist
-            packages/*/build
             packages/*/src/**/*.js
             packages/*/src/**/*.js.map
             packages/*/src/**/*.d.ts
