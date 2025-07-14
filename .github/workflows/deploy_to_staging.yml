@@ -57,12 +57,12 @@ jobs:
               # Deploy Functions app with all dependencies resolved
               pnpm --filter=${{ inputs.package_filter }} deploy --prod deploy/
               
-              (cd deploy/ && zip -rq ../bundle.zip .)
+              (cd deploy/ && zip -rqy ../bundle.zip . --symlinks)
               
             else
               echo "is_functions_app=false" >> $GITHUB_OUTPUT
               STANDALONE_DIR="apps/${{ inputs.turborepo_app_name }}/.next/standalone"              
-              (cd "$STANDALONE_DIR" && zip -rq ../../../../bundle.zip .)
+              (cd "$STANDALONE_DIR" && zip -rqy ../../../../bundle.zip . --symlinks)
             fi
             
           else
@@ -87,7 +87,7 @@ jobs:
               pnpm-lock.yaml
             
             # Create deployment archive
-            zip -rq bundle.zip .
+            zip -rqy bundle.zip . --symlinks
           fi
           
           echo "Bundle complete."
