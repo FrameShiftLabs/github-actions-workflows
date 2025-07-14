@@ -48,16 +48,19 @@ jobs:
           turborepo_caches: ${{ inputs.turborepo_caches }}
 
       - name: Prepare deployment
+        id: prepare-deployment
         run: |
           if [ -n "${{ inputs.package_filter }}" ]; then
             # Check if this is an Azure Functions app (has host.json)
             if pnpm --filter=${{ inputs.package_filter }} exec test -f host.json; then
+              echo "is_functions_app=true" >> $GITHUB_OUTPUT
               # Deploy Functions app with all dependencies resolved
               pnpm --filter=${{ inputs.package_filter }} deploy --prod deploy/
               
               (cd deploy/ && zip -rq ../bundle.zip .)
               
             else
+              echo "is_functions_app=false" >> $GITHUB_OUTPUT
               STANDALONE_DIR="apps/${{ inputs.turborepo_app_name }}/.next/standalone"              
               (cd "$STANDALONE_DIR" && zip -rq ../../../../bundle.zip .)
             fi
@@ -65,6 +68,13 @@ jobs:
           else
             # Single repo project: Build and package normally
             pnpm run build
+            
+            # Check for host.json in root to determine if this is a Functions app
+            if [ -f "host.json" ]; then
+              echo "is_functions_app=true" >> $GITHUB_OUTPUT
+            else
+              echo "is_functions_app=false" >> $GITHUB_OUTPUT
+            fi
             
             # Remove dev dependencies and unused files
             pnpm prune --prod
@@ -90,8 +100,18 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Azure App Service / Function App (Staging)
-        id: deploy-staging
+      - name: Deploy to Azure Functions (Staging)
+        id: deploy-functions-staging
+        if: steps.prepare-deployment.outputs.is_functions_app == 'true'
+        uses: azure/functions-action@v1
+        with:
+          app-name: ${{ inputs.azure_app_name || inputs.project_name }}
+          slot-name: staging
+          package: bundle.zip
+
+      - name: Deploy to Azure App Service (Staging)
+        id: deploy-webapp-staging
+        if: steps.prepare-deployment.outputs.is_functions_app == 'false'
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ inputs.azure_app_name || inputs.project_name }}
