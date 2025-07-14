@@ -57,7 +57,7 @@ jobs:
               # Deploy Functions app with all dependencies resolved
               pnpm --filter=${{ inputs.package_filter }} deploy --prod deploy/ --node-linker=hoisted
               
-              (cd deploy/ && zip -ry ../bundle.zip . --symlinks)
+              (cd deploy/ && zip -rqy ../bundle.zip . --symlinks)
               
             else
               echo "is_functions_app=false" >> $GITHUB_OUTPUT
