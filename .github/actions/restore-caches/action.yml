@@ -60,6 +60,8 @@ runs:
           apps/*/.turbo
           apps/*/src/**/*.js
           apps/*/src/**/*.js.map
+          apps/*/got/**/*.js
+          apps/*/got/**/*.js.map
           apps/*/utils/**/*.js
           apps/*/utils/**/*.js.map
           packages/*/.turbo
@@ -67,4 +69,4 @@ runs:
           packages/*/src/**/*.js.map
           packages/*/src/**/*.d.ts
           packages/*/src/**/*.d.ts.map
-        key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('turbo.json', 'pnpm-lock.yaml', '**/tsconfig.json', 'apps/**/src/**', 'packages/**/src/**', '!**/node_modules/**', '!**/*.js', '!**/*.js.map', '!**/*.d.ts', '!**/*.d.ts.map') }}
+        key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('turbo.json', 'pnpm-lock.yaml', '**/tsconfig.json', 'apps/**/src/**', 'apps/**/got/**', 'apps/**/utils/**', 'packages/**/src/**', '!**/node_modules/**', '!**/*.js', '!**/*.js.map', '!**/*.d.ts', '!**/*.d.ts.map') }}
