@@ -100,18 +100,8 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Azure Functions (Staging)
-        id: deploy-functions-staging
-        if: steps.prepare-deployment.outputs.is_functions_app == 'true'
-        uses: azure/functions-action@v1
-        with:
-          app-name: ${{ inputs.azure_app_name || inputs.project_name }}
-          slot-name: staging
-          package: bundle.zip
-
       - name: Deploy to Azure App Service (Staging)
         id: deploy-webapp-staging
-        if: steps.prepare-deployment.outputs.is_functions_app == 'false'
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ inputs.azure_app_name || inputs.project_name }}
