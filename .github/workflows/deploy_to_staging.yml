@@ -47,6 +47,12 @@ jobs:
           angular_caches: ${{ inputs.angular_caches }}
           turborepo_caches: ${{ inputs.turborepo_caches }}
 
+      - name: Build all packages and apps
+        run: pnpm run build && pnpm run build:standalone
+        env:
+          CLERK_PUBLISHABLE_KEY: ${{ vars.CLERK_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+
       - name: Prepare deployment
         id: prepare-deployment
         run: |
