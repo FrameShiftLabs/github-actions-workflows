@@ -1,5 +1,5 @@
 name: 'Restore Repository and dependencies Cache'
-description: 'Restores the repository and pnpm dependencies cache for a given project and commit SHA.'
+description: 'Restores the repository and pnpm dependencies cache, and optionally sets up Turborepo remote caching for a given project and commit SHA.'
 inputs:
   project_name:
     description: 'The name of the project'
@@ -12,7 +12,7 @@ inputs:
     required: false
     default: 'false'
   turborepo_caches:
-    description: 'Whether to restore turborepo build caches'
+    description: 'Whether to set up Turborepo remote caching for turbo build/lint/test commands'
     required: false
     default: 'false'
 
@@ -49,24 +49,11 @@ runs:
         path: ./dist
         key: ${{ inputs.project_name }}-angular-build-${{ hashFiles('src/**/*') }}
 
-    - name: Restore Turborepo Build Cache
+    - name: Setup Turborepo Remote Caching
       if: ${{ inputs.turborepo_caches == 'true' }}
-      uses: actions/cache/restore@v4
+      uses: rharkor/caching-for-turbo@v2.3.1
       with:
-        path: |
-          .turbo
-          apps/*/.next
-          apps/*/.next/standalone
-          apps/*/.turbo
-          apps/*/src/**/*.js
-          apps/*/src/**/*.js.map
-          apps/*/got/**/*.js
-          apps/*/got/**/*.js.map
-          apps/*/utils/**/*.js
-          apps/*/utils/**/*.js.map
-          packages/*/.turbo
-          packages/*/src/**/*.js
-          packages/*/src/**/*.js.map
-          packages/*/src/**/*.d.ts
-          packages/*/src/**/*.d.ts.map
-        key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('turbo.json', 'pnpm-lock.yaml', '**/tsconfig.json', 'apps/**/src/**', 'apps/**/got/**', 'apps/**/utils/**', 'packages/**/src/**', '!**/node_modules/**', '!**/*.js', '!**/*.js.map', '!**/*.d.ts', '!**/*.d.ts.map') }}
+        cache-prefix: ${{ inputs.project_name }}-turborepo-
+        max-age: 2w
+        max-size: 5gb
+

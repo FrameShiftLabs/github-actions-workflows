@@ -31,24 +31,3 @@ jobs:
         env:
           CLERK_PUBLISHABLE_KEY: ${{ vars.CLERK_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-
-      - name: Save Turborepo Build Cache
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            .turbo
-            apps/*/.next
-            apps/*/.next/standalone
-            apps/*/.turbo
-            apps/*/src/**/*.js
-            apps/*/src/**/*.js.map
-            apps/*/got/**/*.js
-            apps/*/got/**/*.js.map
-            apps/*/utils/**/*.js
-            apps/*/utils/**/*.js.map
-            packages/*/.turbo
-            packages/*/src/**/*.js
-            packages/*/src/**/*.js.map
-            packages/*/src/**/*.d.ts
-            packages/*/src/**/*.d.ts.map
-          key: ${{ inputs.project_name }}-turborepo-build-${{ github.ref_name }}-${{ hashFiles('turbo.json', 'pnpm-lock.yaml', '**/tsconfig.json', 'apps/**/src/**', 'apps/**/got/**', 'apps/**/utils/**', 'packages/**/src/**', '!**/node_modules/**', '!**/*.js', '!**/*.js.map', '!**/*.d.ts', '!**/*.d.ts.map') }}
