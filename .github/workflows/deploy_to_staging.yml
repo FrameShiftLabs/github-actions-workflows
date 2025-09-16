@@ -29,6 +29,11 @@ on:
         required: false
         type: string
         description: 'Azure App Service or Function App name (if different from project_name)'
+      environment:
+        required: false
+        type: string
+        default: 'staging'
+        description: 'Deployment environment (defaults to staging)'
 
 permissions:
   id-token: write
@@ -37,7 +42,7 @@ permissions:
 jobs:
   deploy_to_staging:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: ${{ inputs.environment || 'staging' }}
     steps:
       - name: Restore Caches
         uses: harshithkashyap/github-actions-workflows/.github/actions/restore-caches@main
