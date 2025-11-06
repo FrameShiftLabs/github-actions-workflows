@@ -18,10 +18,19 @@ on:
         required: false
         type: boolean
         default: false
+      runners:
+        required: false
+        type: string
+        default: '["ubuntu-latest"]'
+        description: 'JSON array of runner labels to target (e.g., ["ubuntu-latest","Linux-x64-Large-8-Core"])'
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    name: Lint (${{ matrix.runner }})
+    strategy:
+      matrix:
+        runner: ${{ fromJson(inputs.runners) }}
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Restore Caches
         uses: harshithkashyap/github-actions-workflows/.github/actions/restore-caches@main
