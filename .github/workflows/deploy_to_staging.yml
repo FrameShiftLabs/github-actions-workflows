@@ -34,6 +34,11 @@ on:
         type: string
         default: 'staging'
         description: 'Deployment environment (defaults to staging)'
+      runners:
+        required: false
+        type: string
+        default: '["ubuntu-latest"]'
+        description: 'JSON array of runner labels to target (e.g., ["ubuntu-latest","Linux-x64-Large-8-Core"])'
 
 permissions:
   id-token: write
@@ -41,7 +46,11 @@ permissions:
 
 jobs:
   deploy_to_staging:
-    runs-on: ubuntu-latest
+    name: Deploy to Staging (${{ matrix.runner }})
+    strategy:
+      matrix:
+        runner: ${{ fromJson(inputs.runners) }}
+    runs-on: ${{ matrix.runner }}
     environment: ${{ inputs.environment || 'staging' }}
     steps:
       - name: Restore Caches
