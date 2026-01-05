@@ -73,7 +73,17 @@ jobs:
               
             else
               echo "is_functions_app=false" >> $GITHUB_OUTPUT
-              STANDALONE_DIR="apps/${{ inputs.turborepo_app_name }}/.next/standalone"              
+              STANDALONE_DIR="apps/${{ inputs.turborepo_app_name }}/.next/standalone"
+
+              # Deploy telemetry package with all dependencies for Next.js apps
+              echo "Deploying @repo/telemetry package with dependencies..."
+              pnpm --filter=@repo/telemetry deploy --prod "$STANDALONE_DIR/packages/telemetry"
+
+              # Create symlink for Node.js module resolution
+              echo "Creating symlink for @repo/telemetry..."
+              mkdir -p "$STANDALONE_DIR/apps/${{ inputs.turborepo_app_name }}/node_modules/@repo"
+              ln -sf ../../../../packages/telemetry "$STANDALONE_DIR/apps/${{ inputs.turborepo_app_name }}/node_modules/@repo/telemetry"
+
               (cd "$STANDALONE_DIR" && zip -rqy ../../../../bundle.zip . --symlinks)
             fi
             
