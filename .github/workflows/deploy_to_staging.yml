@@ -41,7 +41,7 @@ permissions:
 
 jobs:
   deploy_to_staging:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     environment: ${{ inputs.environment || 'staging' }}
     steps:
       - name: Restore Caches

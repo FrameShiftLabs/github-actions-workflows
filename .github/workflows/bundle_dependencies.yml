@@ -12,7 +12,7 @@ on:
 
 jobs:
   bundle_dependencies:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Restore Caches
         uses: harshithkashyap/github-actions-workflows/.github/actions/restore-caches@main
