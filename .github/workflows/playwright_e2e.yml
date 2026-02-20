@@ -1,0 +1,86 @@
+name: 'Reusable Playwright E2E Workflow'
+
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+      node_version:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      e2e_base_url:
+        required: false
+        type: string
+        default: 'http://127.0.0.1:3000'
+      e2e_command:
+        required: false
+        type: string
+        default: 'pnpm e2e:popframe'
+      playwright_package:
+        required: false
+        type: string
+        default: '@repo/playwright-popframe'
+      report_path:
+        required: false
+        type: string
+        default: 'packages/playwright-popframe/playwright-report'
+      results_path:
+        required: false
+        type: string
+        default: 'packages/playwright-popframe/test-results'
+      artifact_name_prefix:
+        required: false
+        type: string
+        default: 'playwright-e2e'
+      retention_days:
+        required: false
+        type: number
+        default: 14
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Restore Caches
+        uses: harshithkashyap/github-actions-workflows/.github/actions/restore-caches@main
+        with:
+          project_name: ${{ inputs.project_name }}
+          node_version: ${{ inputs.node_version }}
+          turborepo_caches: true
+
+      - name: Install Playwright browser dependencies
+        run: pnpm --filter ${{ inputs.playwright_package }} exec playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        run: ${{ inputs.e2e_command }}
+        env:
+          # Keep the default reusable workflow minimal.
+          # Add more env vars only when e2e scope expands beyond public smoke coverage.
+          NODE_ENV: development
+          NEXT_PUBLIC_BASE_URL: ${{ inputs.e2e_base_url }}
+          E2E_BASE_URL: ${{ inputs.e2e_base_url }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+
+      - name: Upload Playwright HTML report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name_prefix }}-report-${{ github.run_number }}
+          path: ${{ inputs.report_path }}
+          if-no-files-found: warn
+          retention-days: ${{ inputs.retention_days }}
+
+      - name: Upload Playwright test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name_prefix }}-results-${{ github.run_number }}
+          path: ${{ inputs.results_path }}
+          if-no-files-found: warn
+          retention-days: ${{ inputs.retention_days }}
