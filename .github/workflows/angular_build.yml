@@ -30,7 +30,7 @@ jobs:
           fi
 
       - name: Save Angular Build Cache
-        uses: actions/cache@v4
+        uses: actions/cache/save@v5
         with:
           path: ./dist
           key: ${{ inputs.project_name }}-angular-build-${{ github.ref_name }}-${{ hashFiles('src/**/*') }}

@@ -11,9 +11,10 @@ jobs:
     steps:
       - uses: trstringer/manual-approval@v1
         id: approval
+        timeout-minutes: 30
         with:
           secret: ${{ github.token }}
           approvers: ${{ vars.APPROVERS }}
-          timeout-minutes: 30
           issue-title: 'Production Deployment Approval'
           issue-body: 'Please approve the deployment to production.'
+          fail-on-denial: true

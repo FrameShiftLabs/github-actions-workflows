@@ -20,13 +20,14 @@ runs:
   using: 'composite'
   steps:
     - name: Restore repository cache
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v5
       with:
         path: .
         key: ${{ inputs.project_name }}-repo-${{ github.sha }}
+        fail-on-cache-miss: true
       
     - name: Restore pnpm cache
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           node_modules
@@ -35,23 +36,24 @@ runs:
         key: ${{ inputs.project_name }}-pnpm-dependencies-${{ github.ref_name }}-${{ hashFiles('pnpm-lock.yaml') }}
     
     - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v6
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node_version }}
+        package-manager-cache: false
 
     - name: Restore Angular Build and Cache Files
       if: ${{ inputs.angular_caches == 'true' }}
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v5
       with:
         path: ./dist
-        key: ${{ inputs.project_name }}-angular-build-${{ hashFiles('src/**/*') }}
+        key: ${{ inputs.project_name }}-angular-build-${{ github.ref_name }}-${{ hashFiles('src/**/*') }}
 
     - name: Setup Turborepo Remote Caching
       if: ${{ inputs.turborepo_caches == 'true' }}
-      uses: rharkor/caching-for-turbo@v2.3.1
+      uses: rharkor/caching-for-turbo@v2.3.5
       with:
         cache-prefix: ${{ inputs.project_name }}-turborepo-
         max-age: 2w

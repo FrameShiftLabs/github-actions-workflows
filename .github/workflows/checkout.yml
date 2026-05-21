@@ -12,10 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Cache repository
-        uses: actions/cache@v4
+        uses: actions/cache/save@v5
         with:
           path: .
           key: ${{ inputs.project_name }}-repo-${{ github.sha }}
