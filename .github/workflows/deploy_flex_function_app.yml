@@ -96,7 +96,9 @@ jobs:
 
       - name: Deploy to Azure Function App
         id: deploy-flex-function-app
-        uses: azure/webapps-deploy@v3
+        uses: Azure/functions-action@v1
         with:
           app-name: ${{ inputs.azure_app_name || vars.COMPUTE_FUNCTIONS_APP_NAME || inputs.project_name }}
           package: bundle.zip
+          sku: flexconsumption
+          remote-build: false

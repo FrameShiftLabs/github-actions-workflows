@@ -20,7 +20,7 @@ Modern, pnpm-first CI/CD workflows for JavaScript/TypeScript projects.
 ### Deployment
 - `deploy_to_staging.yml` - Deploy to staging environment
 - `deploy_to_production.yml` - Deploy to production (slot swap)
-- `deploy_flex_function_app.yml` - Deploy directly to an Azure Functions Flex Consumption app
+- `deploy_flex_function_app.yml` - Deploy directly to an Azure Functions Flex Consumption app with the Azure Functions action
 
 ### Utilities
 - `bundle_dependencies.yml` - Install and cache dependencies
