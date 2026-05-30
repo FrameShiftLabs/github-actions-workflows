@@ -100,5 +100,3 @@ jobs:
         with:
           app-name: ${{ inputs.azure_app_name || vars.COMPUTE_FUNCTIONS_APP_NAME || inputs.project_name }}
           package: bundle.zip
-          sku: flexconsumption
-          remote-build: false
