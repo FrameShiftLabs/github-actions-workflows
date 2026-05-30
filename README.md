@@ -8,6 +8,7 @@ Modern, pnpm-first CI/CD workflows for JavaScript/TypeScript projects.
 - **Turborepo support** - Optimized for monorepos with smart caching
 - **Angular support** - Dedicated workflows for Angular projects
 - **Universal deployment** - Works with Azure App Service and Function Apps
+- **Flex Function App deployment** - Direct deploy support for Flex Consumption apps without slots
 
 ## Available Workflows
 
@@ -19,6 +20,7 @@ Modern, pnpm-first CI/CD workflows for JavaScript/TypeScript projects.
 ### Deployment
 - `deploy_to_staging.yml` - Deploy to staging environment
 - `deploy_to_production.yml` - Deploy to production (slot swap)
+- `deploy_flex_function_app.yml` - Deploy directly to an Azure Functions Flex Consumption app
 
 ### Utilities
 - `bundle_dependencies.yml` - Install and cache dependencies

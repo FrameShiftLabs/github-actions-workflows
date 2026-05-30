@@ -1,0 +1,102 @@
+name: 'Reusable Deploy Flex Function App Workflow'
+
+on:
+  workflow_call:
+    inputs:
+      project_name:
+        required: true
+        type: string
+      node_version:
+        required: true
+        type: string
+      package_filter:
+        required: false
+        type: string
+        description: 'pnpm filter for workspace Function Apps (e.g., "@repo/api-functions")'
+      angular_caches:
+        required: false
+        type: boolean
+        default: false
+      turborepo_caches:
+        required: false
+        type: boolean
+        default: false
+      azure_app_name:
+        required: false
+        type: string
+        description: 'Azure Function App name. Defaults to COMPUTE_FUNCTIONS_APP_NAME from the selected environment, then project_name.'
+      environment:
+        required: false
+        type: string
+        default: 'staging'
+        description: 'Deployment environment (defaults to staging)'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy_flex_function_app:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    environment: ${{ inputs.environment || 'staging' }}
+    steps:
+      - name: Restore Caches
+        uses: FrameShiftLabs/github-actions-workflows/.github/actions/restore-caches@main
+        with:
+          project_name: ${{ inputs.project_name }}
+          node_version: ${{ inputs.node_version }}
+          angular_caches: ${{ inputs.angular_caches }}
+          turborepo_caches: ${{ inputs.turborepo_caches }}
+
+      - name: Build Function App package
+        run: |
+          if [ -n "${{ inputs.package_filter }}" ]; then
+            pnpm build --filter="${{ inputs.package_filter }}"
+          else
+            pnpm run build
+          fi
+
+      - name: Prepare Function App deployment
+        run: |
+          if [ -n "${{ inputs.package_filter }}" ]; then
+            if pnpm --filter="${{ inputs.package_filter }}" exec test -f host.json; then
+              pnpm --filter="${{ inputs.package_filter }}" deploy --prod deploy/ --node-linker=hoisted
+              (cd deploy/ && zip -rqy ../bundle.zip . --symlinks)
+            else
+              echo "Package ${{ inputs.package_filter }} does not look like an Azure Functions app: host.json not found."
+              exit 1
+            fi
+          else
+            if [ ! -f "host.json" ]; then
+              echo "Repository root does not look like an Azure Functions app: host.json not found."
+              exit 1
+            fi
+
+            pnpm prune --prod
+            rm -rf \
+              .git/ \
+              .gitignore \
+              .gitattributes \
+              .editorconfig \
+              package-lock.json \
+              pnpm-lock.yaml
+
+            zip -rqy bundle.zip . --symlinks
+          fi
+
+          echo "Bundle complete."
+          ls -l -h bundle.zip
+
+      - name: Azure CLI Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Function App
+        id: deploy-flex-function-app
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ inputs.azure_app_name || vars.COMPUTE_FUNCTIONS_APP_NAME || inputs.project_name }}
+          package: bundle.zip
